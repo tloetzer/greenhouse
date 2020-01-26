@@ -1,15 +1,17 @@
 #include "sensor.hpp"
 
-#include "Arduino.h"
-
-Sensor::Sensor(int pin_)
-    : pin(pin_)
+Sensor::Sensor(int pin)
 {
-    pinMode(pin, INPUT);
+    reader = new SensorReader(pin);
 }
+
+Sensor::Sensor(SensorReader* reader_)
+    : reader(reader_)
+{}
 
 bool Sensor::isDry()
 {
+    //TODO: read value and decide if its dry
     return false;
 }
 
