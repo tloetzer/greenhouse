@@ -29,13 +29,22 @@ void test_dry_if_moisture_low()
     FakeSensorReader reader;
     Sensor sensor(&reader);
     reader.setNextValue(0);
-    TEST_ASSERT(sensor.isDry());
+    TEST_ASSERT_TRUE(sensor.isDry());
+}
+
+void test_not_dry_if_moisture_high()
+{
+    FakeSensorReader reader;
+    Sensor sensor(&reader);
+    reader.setNextValue(1023);
+    TEST_ASSERT_FALSE(sensor.isDry());
 }
 
 void runTests()
 {
     UNITY_BEGIN();
-    test_dry_if_moisture_low();
+    RUN_TEST(test_dry_if_moisture_low);
+    RUN_TEST(test_not_dry_if_moisture_high);
     UNITY_END();
 }
 
