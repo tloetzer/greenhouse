@@ -4,11 +4,9 @@
 class SensorReader
 {
 public:
-    SensorReader(int pin);
+    SensorReader();
 
-    virtual int currentValue();
-private:
-    const int pin;
+    virtual int currentValue() = 0;
 };
 
 #endif

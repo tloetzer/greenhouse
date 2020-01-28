@@ -4,7 +4,7 @@
 class Valve
 {
 public:
-    Valve(int pin);
+    Valve();
 
     bool isWatering()
     {
@@ -13,9 +13,9 @@ public:
 
     void enableWater();
     void disableWater();
+
 private:
     bool watering;
-    int pin;
 };
 
 #endif

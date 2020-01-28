@@ -6,7 +6,6 @@
 class Sensor
 {
 public:
-    Sensor(int pin);
     Sensor(SensorReader* reader);
 
     bool isDry();

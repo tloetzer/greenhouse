@@ -7,7 +7,7 @@ class FakeSensorReader: public SensorReader
 {
 public:
     FakeSensorReader()
-        : SensorReader(0), value(0)
+        : SensorReader(), value(0)
     {}
 
     virtual int currentValue()
