@@ -1,4 +1,8 @@
-#include "Arduino.h"
+#ifdef ARDUINI
+#include <Arduino.h>
+#endif
+
+#include <stddef.h>
 #include "sensor.hpp"
 #include "valve.hpp"
 #include "greenhouse.hpp"
@@ -7,6 +11,7 @@ static const size_t GREENHOUSE_COUNT = 4;
 
 Greenhouse* greenhouses[GREENHOUSE_COUNT];
 
+#ifdef ARDUINO
 void setup()
 {
     greenhouses[0] = new Greenhouse(new Sensor(A0), new Valve(10));
@@ -22,3 +27,5 @@ void loop()
         greenhouses[i]->control();
     }
 }
+
+#endif
