@@ -2,7 +2,7 @@
 
 #include <sensor.hpp>
 #include <sensorreader.hpp>
-#include <valve.hpp>
+#include <pump.hpp>
 #include <clock.hpp>
 #include <greenhouse.hpp>
 
@@ -42,7 +42,7 @@ void test_water_if_dry()
     FakeSensorReader reader;
     Sensor sensor(&reader);
     reader.setNextValue(0);
-    Valve v;
+    Pump p;
     FakeClock c;
     Greenhouse gh(&c, &sensor, &v);
     gh.control();

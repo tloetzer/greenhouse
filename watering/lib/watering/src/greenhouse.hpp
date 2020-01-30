@@ -1,18 +1,18 @@
 #ifndef GREENHOUSE_HPP
 #define GREENHOUSE_HPP
 #include "sensor.hpp"
-#include "valve.hpp"
+#include "pump.hpp"
 #include "clock.hpp"
 
 class Greenhouse
 {
 public:
-    Greenhouse(Clock* clock, Sensor* sensor, Valve* valve);
+    Greenhouse(Clock* clock, Sensor* sensor, Pump* pump);
     void control();
 private:
     Clock* clock;
     Sensor* sensor;
-    Valve* valve;
+    Pump* pump;
 };
 
 #endif

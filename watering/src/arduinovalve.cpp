@@ -1,21 +1,21 @@
-#include "arduinovalve.hpp"
+#include "arduinopump.hpp"
 
 #include <Arduino.h>
 
-ArduinoValve::ArduinoValve(int pin_)
+ArduinoPump::ArduinoPump(int pin_)
     : pin(pin_)
 {
     pinMode(pin_, OUTPUT);
 }
 
-void ArduinoValve::enableWater()
+void ArduinoPump::enableWater()
 {
     digitalWrite(pin, HIGH);
-    Valve::enableWater();
+    Pump::enableWater();
 }
 
-void ArduinoValve::disableWater()
+void ArduinoPump::disableWater()
 {
     digitalWrite(pin, LOW);
-    Valve::disableWater();
+    Pump::disableWater();
 }

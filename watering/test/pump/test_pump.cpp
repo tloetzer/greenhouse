@@ -1,18 +1,18 @@
 #include <unity.h>
 
-#include <valve.hpp>
+#include <pump.hpp>
 
 void test_watering_status_enabled()
 {
-    Valve v;
-    v.enableWater();
+    Pump p;
+    p.enableWater();
     TEST_ASSERT_TRUE(v.isWatering());
 }
 
 void test_watering_status_disabled()
 {
-    Valve v;
-    v.disableWater();
+    Pump p;
+    p.disableWater();
     TEST_ASSERT_FALSE(v.isWatering());
 }
 

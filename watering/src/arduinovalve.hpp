@@ -1,12 +1,12 @@
-#ifndef ARDUINOVALVE_HPP
-#define ARDUINOVALVE_HPP
+#ifndef ARDUINOPUMP_HPP
+#define ARDUINOPUMP_HPP
 
-#include <valve.hpp>
+#include <pump.hpp>
 
-class ArduinoValve: public Valve
+class ArduinoPump: public Pump
 {
 public:
-    ArduinoValve(int pin);
+    ArduinoPump(int pin);
 
     void enableWater();
     void disableWater();

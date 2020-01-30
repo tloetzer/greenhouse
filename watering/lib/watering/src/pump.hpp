@@ -1,10 +1,10 @@
-#ifndef VALVE_HPP
-#define VALVE_HPP
+#ifndef PUMP_HPP
+#define PUMP_HPP
 
-class Valve
+class Pump
 {
 public:
-    Valve();
+    Pump();
 
     bool isWatering()
     {
