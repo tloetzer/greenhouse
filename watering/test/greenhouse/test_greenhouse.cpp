@@ -52,6 +52,7 @@ public:
 const int drySensorValue = 0;
 const int moistSensorValue = 1023;
 const int wateringDuration = 2;
+const int wateringCooldown = 30;
 
 void test_water_if_dry()
 {
@@ -60,7 +61,7 @@ void test_water_if_dry()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration);
+    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 }
@@ -72,7 +73,7 @@ void test_no_water_if_moist()
     reader.setNextValue(moistSensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration);
+    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
 }
@@ -84,13 +85,44 @@ void test_watering_stops_after_time()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration);
+    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
+    c.time.tm_sec = 0;
+    gh.control();
+    TEST_ASSERT_TRUE(p.isWatering());
+    // 1 second before timer stops watering
+    c.time.tm_min = c.time.tm_min + wateringDuration - 1;
+    c.time.tm_sec = 59;
+    gh.control();
+    TEST_ASSERT_TRUE(p.isWatering());
+
+    c.time.tm_min = c.time.tm_min + wateringDuration;
+    c.time.tm_sec = 0;
+    gh.control();
+    TEST_ASSERT_FALSE(p.isWatering());
+
+}
+
+void test_watering_only_restarts_after_cooldown()
+{
+    FakeSensorReader reader;
+    Sensor sensor(&reader);
+    reader.setNextValue(drySensorValue);
+    Pump p;
+    FakeClock c;
+    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
     c.time.tm_min = c.time.tm_min + wateringDuration + 1;
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
+    c.time.tm_min = c.time.tm_min + 1;
+    gh.control();
+    TEST_ASSERT_FALSE(p.isWatering());
+    c.time.tm_min = c.time.tm_min + wateringCooldown + 1;
+    gh.control();
+    TEST_ASSERT_TRUE(p.isWatering());
 }
+
 
 void runTests()
 {
@@ -98,6 +130,7 @@ void runTests()
     RUN_TEST(test_water_if_dry);
     RUN_TEST(test_no_water_if_moist);
     RUN_TEST(test_watering_stops_after_time);
+    RUN_TEST(test_watering_only_restarts_after_cooldown);
     UNITY_END();
 }
 

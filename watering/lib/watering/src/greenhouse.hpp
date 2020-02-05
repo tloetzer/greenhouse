@@ -7,7 +7,7 @@
 class Greenhouse
 {
 public:
-    Greenhouse(Clock* clock, Sensor* sensor, Pump* pump, double wateringDuration);
+    Greenhouse(Clock* clock, Sensor* sensor, Pump* pump, double wateringDuration, double wateringCooldown);
     void control();
 private:
     Clock* clock;
@@ -15,6 +15,9 @@ private:
     Pump* pump;
     time_t startOfCurrentWatering;
     double wateringDuration;
+    double wateringCooldown;
+    double currentWateringDurationMinutes();
+    double minutesSinceLastWatering();
 };
 
 #endif
