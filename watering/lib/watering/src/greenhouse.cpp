@@ -26,3 +26,4 @@ void Greenhouse::control()
         startOfCurrentWatering = clock->currentTime();
     }
 }
+
