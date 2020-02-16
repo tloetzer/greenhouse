@@ -52,8 +52,8 @@ public:
 const int drySensorValue = 400;
 const int moistSensorValue = 395;
 const int wateringDurationSeconds = 5;
-const int wateringCooldownSeconds = 30;
-const int wateringCooldownAfterMoistHours = 8;
+const int wateringCooldownSeconds = 10;
+const int wateringCooldownAfterMoistSeconds = 20;
 
 void test_water_if_dry()
 {
@@ -62,7 +62,7 @@ void test_water_if_dry()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds, wateringCooldownAfterMoistSeconds);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 }
@@ -74,7 +74,7 @@ void test_no_water_if_moist()
     reader.setNextValue(moistSensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds, wateringCooldownAfterMoistSeconds);
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
 }
@@ -86,12 +86,12 @@ void test_watering_stops_after_time()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds, wateringCooldownAfterMoistSeconds);
     c.time.tm_sec = 0;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
     // right before timer stops watering
-    c.time.tm_sec = c.time.tm_sec + wateringDurationSeconds;
+    c.time.tm_sec += wateringDurationSeconds;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 
@@ -107,17 +107,41 @@ void test_watering_only_restarts_after_cooldown()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds, wateringCooldownAfterMoistSeconds);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
-    c.time.tm_sec = c.time.tm_sec + wateringDurationSeconds + 1;
+    c.time.tm_sec += wateringDurationSeconds + 1;
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
-    c.time.tm_sec = c.time.tm_sec + wateringCooldownSeconds + 1;
+    c.time.tm_sec += wateringCooldownSeconds + 1;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 }
 
+void test_watering_only_restarts_after_drying_time_after_moist()
+{
+    FakeSensorReader reader;
+    Sensor sensor(&reader);
+    reader.setNextValue(drySensorValue);
+    Pump p;
+    FakeClock c;
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds, wateringCooldownAfterMoistSeconds);
+    gh.control();
+    TEST_ASSERT_TRUE(p.isWatering());
+    reader.setNextValue(moistSensorValue);
+    c.time.tm_sec += wateringDurationSeconds + wateringCooldownSeconds + 1;
+    gh.control();
+    TEST_ASSERT_FALSE(p.isWatering());
+    reader.setNextValue(drySensorValue);
+    c.time.tm_sec++;
+    gh.control();
+    TEST_ASSERT_FALSE(p.isWatering());
+    c.time.tm_sec += wateringCooldownAfterMoistSeconds;
+    gh.control();
+    TEST_ASSERT_TRUE(p.isWatering());
+}
+
+//TODO: test for second round after initial cooldown after it got moist
 
 void runTests()
 {
@@ -126,6 +150,7 @@ void runTests()
     RUN_TEST(test_no_water_if_moist);
     RUN_TEST(test_watering_stops_after_time);
     RUN_TEST(test_watering_only_restarts_after_cooldown);
+    RUN_TEST(test_watering_only_restarts_after_drying_time_after_moist);
     UNITY_END();
 }
 

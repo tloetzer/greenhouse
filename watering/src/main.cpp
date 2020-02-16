@@ -13,13 +13,22 @@ static const size_t GREENHOUSE_COUNT = 4;
 
 Greenhouse* greenhouses[GREENHOUSE_COUNT];
 
+Greenhouse* newGreenhouse(int sensorPin, int pumpPin)
+{
+    Sensor* sensor = new Sensor(new ArduinoSensorReader(sensorPin));
+    Pump* pump = new ArduinoPunp(pumpPin);
+    double wateringDuration = 5;
+    double wateringCooldown = 30;
+    double wateringCooldownAfterMoist = 60*60*8; //8 hours
+    return new Greenhouse(null /* TODO: clock */, sensor, pump, wateringDuration, wateringCooldown, WateringCooldownAfterMoist);
+
 #ifdef ARDUINO
 void setup()
 {
-    greenhouses[0] = new Greenhouse(new Sensor(new ArduinoSensorReader(A0)), new ArduinoPump(10));
-    greenhouses[1] = new Greenhouse(new Sensor(new ArduinoSensorReader(A1)), new ArduinoPump(11));
-    greenhouses[2] = new Greenhouse(new Sensor(new ArduinoSensorReader(A2)), new ArduinoPump(12));
-    greenhouses[3] = new Greenhouse(new Sensor(new ArduinoSensorReader(A3)), new ArduinoPump(13));
+    greenhouses[0] = newGreenhouse(A0, 10);
+    greenhouses[1] = newGreenhouse(A1, 11);
+    greenhouses[2] = newGreenhouse(A2, 12);
+    greenhouses[3] = newGreenhouse(A3, 13);
 }
 
 void loop()
