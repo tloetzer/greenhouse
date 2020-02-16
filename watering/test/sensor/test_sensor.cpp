@@ -28,7 +28,7 @@ void test_dry_if_moisture_low()
 {
     FakeSensorReader reader;
     Sensor sensor(&reader);
-    reader.setNextValue(0);
+    reader.setNextValue(400);
     TEST_ASSERT_TRUE(sensor.isDry());
 }
 
@@ -36,7 +36,7 @@ void test_not_dry_if_moisture_high()
 {
     FakeSensorReader reader;
     Sensor sensor(&reader);
-    reader.setNextValue(1023);
+    reader.setNextValue(399);
     TEST_ASSERT_FALSE(sensor.isDry());
 }
 

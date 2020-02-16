@@ -49,10 +49,11 @@ public:
     tm time;
 };
 
-const int drySensorValue = 0;
-const int moistSensorValue = 1023;
-const int wateringDuration = 2;
-const int wateringCooldown = 30;
+const int drySensorValue = 400;
+const int moistSensorValue = 395;
+const int wateringDurationSeconds = 5;
+const int wateringCooldownSeconds = 30;
+const int wateringCooldownAfterMoistHours = 8;
 
 void test_water_if_dry()
 {
@@ -61,7 +62,7 @@ void test_water_if_dry()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 }
@@ -73,7 +74,7 @@ void test_no_water_if_moist()
     reader.setNextValue(moistSensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
 }
@@ -85,21 +86,18 @@ void test_watering_stops_after_time()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
     c.time.tm_sec = 0;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
-    // 1 second before timer stops watering
-    c.time.tm_min = c.time.tm_min + wateringDuration - 1;
-    c.time.tm_sec = 59;
+    // right before timer stops watering
+    c.time.tm_sec = c.time.tm_sec + wateringDurationSeconds;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 
-    c.time.tm_min = c.time.tm_min + wateringDuration;
-    c.time.tm_sec = 0;
+    c.time.tm_sec++;
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
-
 }
 
 void test_watering_only_restarts_after_cooldown()
@@ -109,16 +107,13 @@ void test_watering_only_restarts_after_cooldown()
     reader.setNextValue(drySensorValue);
     Pump p;
     FakeClock c;
-    Greenhouse gh(&c, &sensor, &p, wateringDuration, wateringCooldown);
+    Greenhouse gh(&c, &sensor, &p, wateringDurationSeconds, wateringCooldownSeconds);
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
-    c.time.tm_min = c.time.tm_min + wateringDuration + 1;
+    c.time.tm_sec = c.time.tm_sec + wateringDurationSeconds + 1;
     gh.control();
     TEST_ASSERT_FALSE(p.isWatering());
-    c.time.tm_min = c.time.tm_min + 1;
-    gh.control();
-    TEST_ASSERT_FALSE(p.isWatering());
-    c.time.tm_min = c.time.tm_min + wateringCooldown + 1;
+    c.time.tm_sec = c.time.tm_sec + wateringCooldownSeconds + 1;
     gh.control();
     TEST_ASSERT_TRUE(p.isWatering());
 }

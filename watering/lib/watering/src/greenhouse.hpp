@@ -16,8 +16,8 @@ private:
     time_t startOfCurrentWatering;
     double wateringDuration;
     double wateringCooldown;
-    double currentWateringDurationMinutes();
-    double minutesSinceLastWatering();
+    double currentWateringDurationSeconds();
+    double secondsSinceLastWatering();
 };
 
 #endif

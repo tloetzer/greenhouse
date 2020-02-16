@@ -6,7 +6,6 @@ Sensor::Sensor(SensorReader* reader_)
 
 bool Sensor::isDry()
 {
-    //TODO: read value and decide if its dry
-    return reader->currentValue() == 0;
+    return reader->currentValue() >= 400;
 }
 

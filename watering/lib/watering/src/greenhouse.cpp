@@ -6,21 +6,21 @@ Greenhouse::Greenhouse(Clock* clock_, Sensor* sensor_, Pump* pump_, double water
 {
 }
 
-double Greenhouse::currentWateringDurationMinutes() {
-    return difftime(clock->currentTime(), startOfCurrentWatering) / 60;
+double Greenhouse::currentWateringDurationSeconds() {
+    return difftime(clock->currentTime(), startOfCurrentWatering);
 }
 
-double Greenhouse::minutesSinceLastWatering() {
-    return (difftime(clock->currentTime(), startOfCurrentWatering) - (wateringDuration * 60)) / 60;
+double Greenhouse::secondsSinceLastWatering() {
+    return difftime(clock->currentTime(), startOfCurrentWatering) - wateringDuration;
 }
 
 void Greenhouse::control()
 {
-    if(pump->isWatering() && (currentWateringDurationMinutes() > wateringDuration))
+    if(pump->isWatering() && (currentWateringDurationSeconds() > wateringDuration))
     {
         pump->disableWater();
     }
-    if(sensor->isDry() && (minutesSinceLastWatering() > wateringCooldown))
+    if(sensor->isDry() && (secondsSinceLastWatering() > wateringCooldown))
     {
         pump->enableWater();
         startOfCurrentWatering = clock->currentTime();
