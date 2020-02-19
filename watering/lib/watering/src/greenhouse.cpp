@@ -18,7 +18,12 @@ double Greenhouse::secondsSinceLastWatering() {
 
 void Greenhouse::control()
 {
-    if(wateringBlocked && secondsSinceLastWatering() <= wateringCooldownAfterMoist)
+    if(secondsSinceLastWatering() >= wateringCooldownAfterMoist)
+    {
+        wateringBlocked = false;
+    }
+
+    if(wateringBlocked)
     {
         return;
     }
